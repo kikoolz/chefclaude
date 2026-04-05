@@ -150,4 +150,4 @@ the code is working, but your token or provider configuration needs to support a
 
 ## License
 
-This project is currently unlicensed unless you add a license file.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
