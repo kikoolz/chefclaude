@@ -7,7 +7,10 @@ render to a web page.
 `;
 
 const hfToken = import.meta.env.VITE_HF_API_KEY;
-const HF_API_URL = "/api/huggingface/v1/chat/completions";
+const IS_PRODUCTION = import.meta.env.PROD;
+const HF_API_URL = IS_PRODUCTION
+  ? "/api/recipe"
+  : "/api/huggingface/v1/chat/completions";
 const HF_MODELS = [
   "meta-llama/Llama-3.1-8B-Instruct",
   "deepseek-ai/DeepSeek-V3-0324",
@@ -28,7 +31,7 @@ export async function getRecipeFromMistral(ingredientsArr) {
   ];
 
   try {
-    if (!hfToken) {
+    if (!IS_PRODUCTION && !hfToken) {
       throw new Error("Missing VITE_HF_API_KEY in your .env file.");
     }
 
@@ -38,14 +41,14 @@ export async function getRecipeFromMistral(ingredientsArr) {
       const response = await fetch(HF_API_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${hfToken}`,
           "Content-Type": "application/json",
+          ...(IS_PRODUCTION ? {} : { Authorization: `Bearer ${hfToken}` }),
         },
         body: JSON.stringify({
-          model,
           messages,
           max_tokens: 512,
           temperature: 0.7,
+          ...(IS_PRODUCTION ? { models: HF_MODELS } : { model }),
         }),
       });
 
